@@ -1,4 +1,4 @@
-import { ActivityIndicator, Button, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Button, ImageBackground, Image, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react'
 import { CONFIG_AUTH } from '../../firebaseConfig';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
@@ -14,7 +14,7 @@ const Login = () => {
     try {
       const response = await signInWithEmailAndPassword(auth, email, password);
       console.log(response);
-      alert('Please Work...')
+      alert('Welcome Back!')
     } catch(error : any) {
       console.log(error);
       alert('Problem with Sign In: ' + error.message);
@@ -37,9 +37,10 @@ const Login = () => {
     }
   }
 
-
   return (
-    <KeyboardAvoidingView style={styles.container} behavior="padding">
+    <ImageBackground source={require('../../assets/gradientbackground.jpg')} style={styles.container}>
+      <KeyboardAvoidingView style={styles.container} behavior="padding">
+        <Image source={require('../../assets/gplogo.png')} style={styles.logo}></Image>
         <View>
             <TextInput
              placeholder="Email"
@@ -55,9 +56,13 @@ const Login = () => {
              secureTextEntry={true}
             />
         </View>
-
+        
+        {/* if loading (means that user has attempted to login/register), display the loading indicator.
+            else keep login and register buttons on display 
+            NOTE: 'loading' is triggered upon SignIn() or SignUp()
+        */}
         { loading ? (
-              <ActivityIndicator size="large" color="0000ff" />
+              <ActivityIndicator size="large" color="black" />
             ) : (
               <>
                 <View style={styles.buttonContainer}>
@@ -72,7 +77,9 @@ const Login = () => {
               </>
             )}
 
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </ImageBackground>
+
   )
 }
 
@@ -82,15 +89,21 @@ const styles = StyleSheet.create({
   container: {
       flex: 1,
       justifyContent: 'center',
-      alignItems: 'center'
+      alignItems: 'center',
+  },
+
+  logo: {
+    marginTop:-170,
+    marginBottom:-150,
+
   },
 
   input: {
       height: 40,
-      borderColor: 'gray',
+      borderColor: 'black',
       paddingHorizontal: 100,
       paddingVertical: 10,
-      borderWidth: 1,
+      borderWidth: 1.5,
       margin: 8,
       borderRadius: 4,
   },
@@ -99,22 +112,22 @@ const styles = StyleSheet.create({
       width:'60%',
       justifyContent:'center',
       alignItems: 'center',
-      marginTop: 40,
+      marginTop: 10,
 
   },
 
   button: {
-      width: '100%',
+      width: 250,
       padding: 15,
       margin: 8,
       borderRadius: 10,
-      backgroundColor: '#89CFF0',
+      backgroundColor: 'black',
       alignItems:'center',
   },
 
   buttonOutline: {
       backgroundColor: 'white',
-      borderColor: '#89CFF0',
+      borderColor: 'black',
       borderWidth: 2,
   },
 

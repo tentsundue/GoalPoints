@@ -8,6 +8,7 @@ import Profile from './app/screens/Profile';
 import { useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { CONFIG_AUTH } from './firebaseConfig';
+import Rewards from './app/screens/Rewards';
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +20,7 @@ function InsideLayout() {
     <InsideStack.Navigator>
       <InsideStack.Screen name="Home Page" component={Home}></InsideStack.Screen>
       <InsideStack.Screen name="Profile Page" component={Profile}></InsideStack.Screen>
+      <InsideStack.Screen name="Rewards" component={Rewards}></InsideStack.Screen>
     </InsideStack.Navigator>
   )
 }
