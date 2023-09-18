@@ -18,9 +18,9 @@ function InsideLayout() {
   // Holds all other screens after user successfully signs in
   return (
     <InsideStack.Navigator>
-      <InsideStack.Screen name="Home Page" component={Home}></InsideStack.Screen>
-      <InsideStack.Screen name="Profile Page" component={Profile}></InsideStack.Screen>
-      <InsideStack.Screen name="Rewards" component={Rewards}></InsideStack.Screen>
+      <InsideStack.Screen name="Home Page" component={Home} options={{ headerShown: false }}></InsideStack.Screen>
+      <InsideStack.Screen name="Profile Page" component={Profile} options={{ headerShown: false }}></InsideStack.Screen>
+      <InsideStack.Screen name="Rewards" component={Rewards} options={{ headerShown: false }}></InsideStack.Screen>
     </InsideStack.Navigator>
   )
 }
