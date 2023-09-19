@@ -1,13 +1,13 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 
-
 interface GoalsEntryProps {
     // Defines the type of the props parameter as an object with a text property of type 'string'
     text: string;
+    points: number;
 }
 
-const GoalsEntry : React.FC<GoalsEntryProps> = ({text}) => {
+const GoalsEntry : React.FC<GoalsEntryProps> = ({text, points}) => {
     // Annoated the props parameter with type 'GoalsEntryProps'
     // Makes it clear that the function wants an object with a 'text' property
   return (
@@ -15,15 +15,15 @@ const GoalsEntry : React.FC<GoalsEntryProps> = ({text}) => {
         <View style={styles.itemLeft}>
             <TouchableOpacity style={styles.pointsDisplay}>
                 {/* Placeholder for where points will be displayed */}
-                <Text> ## pts</Text>
+                <Text>{points} pts</Text>
             </TouchableOpacity>
 
             <Text style={styles.entryText}>{text}</Text>
         </View>
 
-        <View style={styles.checkoffEntry}>
+        {/* <View style={styles.checkoffEntry}>
 
-        </View>
+        </View> */}
     </View>
   )
 }

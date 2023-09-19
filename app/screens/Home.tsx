@@ -1,35 +1,74 @@
 import { Button, FlatList, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
-import { CONFIG_AUTH } from '../../firebaseConfig';
+import { CONFIG_AUTH, CONFIG_DB } from '../../firebaseConfig';
 import GoalsEntry from './GoalsEntry';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 interface RouterProps {
     navigation: NavigationProp<any, any>;
 }
 
+function getRandomInt(min: number, max: number): number {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 const Home = ({ navigation }: RouterProps) => {
   const [goal, setGoal] = useState(""); // 'goals' initialized as a empty object
-  const [goalsArray, setGoalsArray] = useState<string[]>([]); // 'goalsArray' initialized as an empty array
+  const [goalsArray, setGoalsArray] = useState<Array<{ text: string, points: number}>>([]); // 'goalsArray' initialized as an empty array
+  const [userPoints, setUserPoints] = useState(0);
+  const [lastUpdated, setLastUpdated] = useState(Date.now());
+
   const flatListRef = useRef<FlatList<any>>(null);
+  const pts = getRandomInt(1, 15);
+  const userId = CONFIG_AUTH.currentUser?.uid;
 
-  const handleAddGoal = () => {
-    // if the goal being added is not an empty string, it is appended to the current goalsArray
-    if (goal.trim()) {
-      setGoalsArray([...goalsArray, goal]);
-      setGoal(""); // Resets the 'goal' input after adding the goal to the array
-      flatListRef.current?.scrollToEnd({ animated: true });
-    }
+
+const handleAddGoal = () => {
+  // if the goal being added is not an empty string, it is appended to the current goalsArray
+  if (goal.trim()) {
+    setGoalsArray([...goalsArray, {text: goal, points: pts}]);
+    setGoal(""); // Resets the 'goal' input after adding the goal to the array
+    flatListRef.current?.scrollToEnd({ animated: true });
   }
-  const handleCompleteGoal = (index: number) => {
+}
+const handleCompleteGoal = async (index: number) => {
+  let addedPoints = goalsArray[index].points;
+  let goalsCopy = [...goalsArray];
+  goalsCopy.splice(index, 1); // removes the item at index in the goalsArray
+  setGoalsArray(goalsCopy); // Reestablishes the new goalsArray as the copy which doesn't contain the completed goal
 
-    let goalsCopy = [...goalsArray];
-    goalsCopy.splice(index, 1); // removes the item at index in the goalsArray
-    setGoalsArray(goalsCopy); // Reestablishes the new goalsArray as the copy which doesn't contain the completed goal
+  if (userId) {
+    const userDocRef = doc(CONFIG_DB, 'users', userId); // create a reference to a document in the Firestore db where the user's data is stored
+    const userDoc = await getDoc(userDocRef); // retrieves the user's document from Firestore | fetching data from Firestore is asynchronous (hence 'await')
+    let currentPoints = userDoc.data()?.points || 0;
+    currentPoints += addedPoints;
+    await setDoc(userDocRef, { points: currentPoints }, { merge: true });
+    setLastUpdated(Date.now());
   }
+}
 
+useEffect(() => {
+  const retrieveUserPoints = async () => {
+    const pointsAttained = await handleRetrievePoints();
+    console.log("fetched points: " + pointsAttained);
+    setUserPoints(pointsAttained);
+  };
+  retrieveUserPoints();
+
+}, [lastUpdated]);
+
+const handleRetrievePoints = async() => {
+  if (userId) {
+    const userDocRef = doc(CONFIG_DB, 'users', userId);
+    const userDoc = await getDoc(userDocRef);
+    return userDoc.data()?.points;
+  }
+}
   return (
-    <ImageBackground source={require('../../assets/gradientbackground.jpg')} style={styles.container}>
+    <ImageBackground source={require('../../assets/background.jpg')} style={styles.container}>
       <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={() => CONFIG_AUTH.signOut()} style={styles.button}>
           <Text style={styles.text}>Sign Out</Text>
@@ -43,7 +82,12 @@ const Home = ({ navigation }: RouterProps) => {
           <Text style={styles.text}>Profile</Text>
         </TouchableOpacity>
       </View>
+      <View style={styles.lineDivisor}>
 
+      </View>
+      <View style={styles.totalPoints}>
+        <Text style={styles.totalPointsText}>Total Points: {userPoints}</Text>
+      </View>
       <View style={{flex: 1}}>
         {/* Lists of goals, each GoalsEntry component is an entry in a list of goals set by the user*/}
         <FlatList 
@@ -52,14 +96,12 @@ const Home = ({ navigation }: RouterProps) => {
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item, index }) => (
             <TouchableOpacity onPress={() => handleCompleteGoal(index)}>
-              <GoalsEntry key={index.toString()} text={item} />
+              <GoalsEntry key={index.toString()} text={item["text"]} points={item["points"]}/>
             </TouchableOpacity>
           )}
         />
-
-
       </View>
-      
+ 
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.GoalsWrapper}>
         <TextInput 
           placeholder='Add a Goal Here!'
@@ -93,9 +135,17 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',    // This will align the buttons in a row
     justifyContent: 'space-around', // This will add some space between the buttons
-    marginTop: 0 // was -500
+    marginTop: 15
   },
-
+  
+  lineDivisor: {
+    borderWidth: 1,
+    borderColor: 'black',
+    width: 300,
+    marginTop: -30,
+    marginBottom: 10,
+    opacity: 0.4,
+  },
   button:{
     width: 100,
     padding: 8,
@@ -114,6 +164,15 @@ const styles = StyleSheet.create({
 
   text: {
     fontSize:20
+  },
+
+  totalPoints: {
+    marginRight: 190,
+    marginBottom: 15,
+  },
+
+  totalPointsText: {
+    fontSize: 25
   },
 
   GoalsWrapper: {
