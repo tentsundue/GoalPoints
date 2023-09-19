@@ -38,7 +38,7 @@ const Login = () => {
   }
 
   return (
-    <ImageBackground source={require('../../assets/gradientbackground.jpg')} style={styles.container}>
+    <ImageBackground source={require('../../assets/background.jpg')} style={styles.container}>
       <KeyboardAvoidingView style={styles.container} behavior="padding">
         <Image source={require('../../assets/gplogo.png')} style={styles.logo}></Image>
         <View>

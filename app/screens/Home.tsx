@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    fontSize:20
+    fontSize:20,
   },
 
   totalPoints: {
