@@ -1,6 +1,6 @@
 import { Button, FlatList, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
-import { NavigationProp } from '@react-navigation/native';
+import { NavigationProp, useFocusEffect } from '@react-navigation/native';
 import { CONFIG_AUTH, CONFIG_DB } from '../../firebaseConfig';
 import GoalsEntry from './GoalsEntry';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -22,7 +22,7 @@ const Home = ({ navigation }: RouterProps) => {
   const [lastUpdated, setLastUpdated] = useState(Date.now());
 
   const flatListRef = useRef<FlatList<any>>(null);
-  const pts = getRandomInt(1, 15);
+  const pts = getRandomInt(5, 20);
   const userId = CONFIG_AUTH.currentUser?.uid;
 
 
@@ -50,23 +50,22 @@ const handleCompleteGoal = async (index: number) => {
   }
 }
 
-useEffect(() => {
-  const retrieveUserPoints = async () => {
-    const pointsAttained = await handleRetrievePoints();
-    console.log("fetched points: " + pointsAttained);
-    setUserPoints(pointsAttained);
-  };
-  retrieveUserPoints();
-
-}, [lastUpdated]);
-
 const handleRetrievePoints = async() => {
   if (userId) {
     const userDocRef = doc(CONFIG_DB, 'users', userId);
     const userDoc = await getDoc(userDocRef);
-    return userDoc.data()?.points;
+    setUserPoints(userDoc.data()?.points);
   }
 }
+
+// Used for every time Home Screen comes into focus
+useFocusEffect(
+  // useCallback() remembers the result of a function call instead of re-running it every time (AKA it memoizes)
+  React.useCallback(() => {
+    handleRetrievePoints(); // Only retrieves points when lastUpdated changes (it only changes when a goal is completed)
+  }, [lastUpdated])
+);
+
   return (
     <ImageBackground source={require('../../assets/background.jpg')} style={styles.container}>
       <View style={styles.buttonContainer}>

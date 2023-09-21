@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     pointsDisplay: {
         width: 61,
         height: 24,
-        backgroundColor: '#D9D9D9',
+        backgroundColor: 'white',
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 28,
