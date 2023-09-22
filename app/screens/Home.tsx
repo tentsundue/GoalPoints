@@ -138,6 +138,7 @@ const styles = StyleSheet.create({
   },
   
   lineDivisor: {
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: 'black',
     width: 300,
@@ -145,6 +146,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     opacity: 0.4,
   },
+  
   button:{
     width: 100,
     padding: 8,
@@ -166,7 +168,7 @@ const styles = StyleSheet.create({
   },
 
   totalPoints: {
-    marginRight: 190,
+    alignItems: 'center',
     marginBottom: 15,
   },
 

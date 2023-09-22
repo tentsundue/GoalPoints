@@ -36,7 +36,7 @@ const handleAddRewards = () => {
   }
 }
 const handleRedeemReward = async (index: number) => {
-  let rewardCost = 1;
+  let rewardCost = rewardsArray[index].points;
   if (userId) {
     const userDocRef = doc(CONFIG_DB, 'users', userId); // create a reference to a document in the Firestore db where the user's data is stored
     const userDoc = await getDoc(userDocRef); // retrieves the user's document from Firestore | fetching data from Firestore is asynchronous (hence 'await')
@@ -71,8 +71,6 @@ useFocusEffect(
   }, [lastUpdated])
 );
 
-
-
   return (
     <ImageBackground source={require('../../assets/rewardsBackground.jpeg')} style={styles.container}>
       <View style={styles.buttonContainer}>
@@ -91,9 +89,11 @@ useFocusEffect(
       <View style={styles.lineDivisor}>
 
       </View>
+
       <View style={styles.totalPoints}>
         <Text style={styles.totalPointsText}>Total Points: {userPoints}</Text>
       </View>
+
       <View style={{flex: 1}}>
         {/* Lists of goals, each GoalsEntry component is an entry in a list of goals set by the user*/}
         <FlatList 
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   },
 
   totalPoints: {
-    marginRight: 190,
+    alignItems: 'center',
     marginBottom: 15,
   },
 
